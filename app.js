@@ -11,9 +11,25 @@ let todos = [
 app.get('/todos', (req, res) => {
   res.status(200).json(todos); // Send array as JSON
 });
+app.get('/todos/active', (req, res) =>{
+  const activeTodos = todos.filter(todo =>!todo.completed);
+  res.status(200).json(activeTodos);
+});
+app.get('/todos/:id', (req, res)=>{
+  const id =Number(req.params.id);
+  const todo =todos.find(todo => todo.id===id);
+
+  if (!todo){
+    return res.status(404).json({message: 'Todo not found'});
+  }
+  res.status(200).json(todo);
+})
 
 // POST New – Create
 app.post('/todos', (req, res) => {
+  if (!req.body.task) {
+    return res.status(400).json({message:'Task is required'});
+  }
   const newTodo = { id: todos.length + 1, ...req.body }; // Auto-ID
   todos.push(newTodo);
   res.status(201).json(newTodo); // Echo back
